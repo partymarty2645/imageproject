@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users collection - strict validation
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null
+        && request.auth.uid == userId
+        && validateUserData(request.resource.data);
+    }
+
+    // Daily moments - allow both partners to read/write
+    match /dailyMoments/{date} {
+      allow read: if request.auth != null
+        && isValidDate(date)
+        && isAuthorizedUser(request.auth.uid);
+      allow create: if request.auth != null
+        && isAuthorizedUser(request.auth.uid)
+        && validateDailyMoment(request.resource.data);
+      allow update: if request.auth != null
+        && isAuthorizedUser(request.auth.uid)
+        && validateDailyMomentUpdate(request.resource.data, resource.data);
+
+      match /chat/{messageId} {
+        allow read: if request.auth != null
+          && isAuthorizedUser(request.auth.uid);
+        allow create: if request.auth != null
+          && validateChatMessage(request.resource.data)
+          && request.resource.data.userId == request.auth.uid
+          && isAuthorizedUser(request.auth.uid);
+      }
+    }
+
+    // Helper functions
+    function isAuthorizedUser(userId) {
+      return userId in ['user1', 'user2'];
+    }
+
+    function validateUserData(data) {
+      return data.keys().hasAll(['id', 'username', 'email', 'partnerId'])
+        && data.email is string
+        && data.username is string
+        && data.id in ['user1', 'user2']
+        && data.partnerId in ['user1', 'user2'];
+    }
+
+    function validateDailyMoment(data) {
+      return data.keys().hasAll(['question', 'questionBy', 'imageUrl', 'date'])
+        && data.question is string
+        && data.questionBy in ['user1', 'user2']
+        && data.imageUrl is string
+        && data.date is string;
+    }
+
+    function validateDailyMomentUpdate(newData, existingData) {
+      // Only allow updating answers array
+      return newData.diff(existingData).affectedKeys().hasOnly(['answers'])
+        && newData.answers is list
+        && validateAnswersArray(newData.answers);
+    }
+
+    function validateAnswersArray(answers) {
+      return answers.size() <= 2  // Max 2 users
+        && answers is list
+        && (answers.size() == 0 ||
+            (answers.size() >= 1 &&
+             answers[0].keys().hasAll(['userId', 'answer']) &&
+             answers[0].userId in ['user1', 'user2'] &&
+             answers[0].answer is string &&
+             answers[0].answer.size() <= 1000) &&
+            (answers.size() < 2 ||
+             (answers[1].keys().hasAll(['userId', 'answer']) &&
+              answers[1].userId in ['user1', 'user2'] &&
+              answers[1].answer is string &&
+              answers[1].answer.size() <= 1000)));
+    }
+
+    function validateChatMessage(data) {
+      return data.keys().hasAll(['userId', 'username', 'message'])
+        && data.message is string
+        && data.message.size() > 0
+        && data.message.size() <= 500  // Reasonable message length
+        && data.userId in ['user1', 'user2'];
+    }
+
+    function isValidDate(date) {
+      return date.matches('^\\d{4}-\\d{2}-\\d{2}$');
+    }
+  }
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-                resultDiv.innerHTML = '<div class="status loading">🧚 Generating fantasy magical image...</div>';cale=1.0">
+    <title>Image API Test - A Thoughtful Moment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .image-result {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        img {
+            max-width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: rgba(76, 175, 80, 0.2); border: 1px solid #4CAF50; }
+        .error { background: rgba(244, 67, 54, 0.2); border: 1px solid #F44336; }
+        .info { background: rgba(33, 150, 243, 0.2); border: 1px solid #2196F3; }
+        .loading { background: rgba(255, 193, 7, 0.2); border: 1px solid #FFC107; }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧚 Fantasy Image API Test - A Thoughtful Moment</h1>
+        <p>Testing Pexels and Pixabay API integration for fantasy/magical images</p>
+
+        <div class="test-section">
+            <h2>🔑 API Keys Status</h2>
+            <div id="api-status" class="status info">Checking API keys...</div>
+        </div>
+
+        <div class="test-section">
+            <h2>🧚 Generate Fantasy Magical Images</h2>
+            <p>Testing the fantasy theme: nature, animals, horses, cats, black labradors, fairies, elves, mythical creatures</p>
+            <button id="generate-btn">Generate Fantasy Image</button>
+            <button id="generate-multiple-btn">Generate 3 Fantasy Images</button>
+            <button id="clear-results-btn">Clear Results</button>
+        </div>
+
+        <div id="results-container"></div>
+    </div>
+
+    <script type="module">
+        import { generateDailyInspirationalImage } from './services/inspirationalImageService.js';
+        import { env } from './src/env-config.js';
+
+        // Check API keys status
+        function checkApiKeys() {
+            const pexelsKey = env.PEXELS_API_KEY;
+            const pixabayKey = env.PIXABAY_API_KEY;
+
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.innerHTML = `
+                <strong>Pexels API Key:</strong> ${pexelsKey ? '✅ Configured' : '❌ Missing'}<br>
+                <strong>Pixabay API Key:</strong> ${pixabayKey ? '✅ Configured' : '❌ Missing'}
+            `;
+
+            if (pexelsKey && pixabayKey) {
+                statusDiv.className = 'status success';
+            } else if (pexelsKey || pixabayKey) {
+                statusDiv.className = 'status info';
+                statusDiv.innerHTML += '<br><em>Partial configuration - some fallbacks may be used</em>';
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML += '<br><em>No API keys - will use curated fallbacks only</em>';
+            }
+        }
+
+        // Generate single image
+        async function generateImage() {
+            const resultsContainer = document.getElementById('results-container');
+            const generateBtn = document.getElementById('generate-btn');
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'image-result';
+            resultDiv.innerHTML = '<div class="status loading">🎨 Generating inspirational image...</div>';
+            resultsContainer.appendChild(resultDiv);
+
+            try {
+                const startTime = Date.now();
+                const imageDataUrl = await generateDailyInspirationalImage();
+                const endTime = Date.now();
+
+                resultDiv.innerHTML = `
+                    <div class="status success">🧚 Fantasy image generated successfully in ${(endTime - startTime)}ms</div>
+                    <img src="${imageDataUrl}" alt="Generated fantasy magical image" />
+                    <details>
+                        <summary>Technical Details</summary>
+                        <pre>Data URL length: ${imageDataUrl.length} characters
+Data URL preview: ${imageDataUrl.substring(0, 100)}...</pre>
+                    </details>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="status error">❌ Image generation failed: ${error.message}</div>
+                    <details>
+                        <summary>Error Details</summary>
+                        <pre>${error.stack}</pre>
+                    </details>
+                `;
+            }
+
+            generateBtn.disabled = false;
+            generateBtn.textContent = 'Generate Fantasy Image';
+        }
+
+        // Generate multiple images
+        async function generateMultipleImages() {
+            const resultsContainer = document.getElementById('results-container');
+            const generateMultipleBtn = document.getElementById('generate-multiple-btn');
+
+            generateMultipleBtn.disabled = true;
+            generateMultipleBtn.textContent = 'Generating...';
+
+            for (let i = 1; i <= 3; i++) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = 'image-result';
+                resultDiv.innerHTML = `<div class="status loading">🧚 Generating fantasy image ${i}/3...</div>`;
+                resultsContainer.appendChild(resultDiv);
+
+                try {
+                    const startTime = Date.now();
+                    const imageDataUrl = await generateDailyInspirationalImage();
+                    const endTime = Date.now();
+
+                    resultDiv.innerHTML = `
+                        <div class="status success">🧚 Fantasy image ${i} generated successfully in ${(endTime - startTime)}ms</div>
+                        <img src="${imageDataUrl}" alt="Generated fantasy magical image ${i}" />
+                    `;
+                } catch (error) {
+                    resultDiv.innerHTML = `
+                        <div class="status error">❌ Image ${i} generation failed: ${error.message}</div>
+                    `;
+                }
+
+                // Small delay between generations
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            generateMultipleBtn.disabled = false;
+            generateMultipleBtn.textContent = 'Generate 3 Images';
+        }
+
+        // Clear results
+        function clearResults() {
+            document.getElementById('results-container').innerHTML = '';
+        }
+
+        // Event listeners
+        document.getElementById('generate-btn').addEventListener('click', generateImage);
+        document.getElementById('generate-multiple-btn').addEventListener('click', generateMultipleImages);
+        document.getElementById('clear-results-btn').addEventListener('click', clearResults);
+
+        // Initialize
+        checkApiKeys();
+    </script>
+</body>
+</html>
