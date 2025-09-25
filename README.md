@@ -139,12 +139,6 @@ firebase deploy --only hosting
 - Calendar view for past entries
 - Mobile-responsive design
 
-## User Accounts
-
-The app is configured for exactly 2 users:
-- **Marty**: marty.vandenberk@gmail.com
-- **Marieke**: mariekevanderdennen@gmail.com
-
 ## Development
 
 ### Project Structure
@@ -157,21 +151,6 @@ src/
 ├── types.ts       # TypeScript interfaces
 └── constants.ts   # App configuration
 ```
-
-### Adding New Features
-1. Update types in `types.ts`
-2. Add service functions in appropriate `services/` file
-3. Create/update components
-4. Update state management in `hooks/useDailyView.ts`
-5. Test with both user accounts
-
-## Troubleshooting
-
-### Common Issues
-- **API Key Issues**: Ensure `GEMINI_API_KEY` is set in `.env.local`
-- **Firebase Auth**: Check that users are properly configured in Firebase Console
-- **Build Errors**: Run `npm install` to ensure all dependencies are installed
-- **CORS Issues**: Firebase Storage rules may need updating for local development
 
 ### Firebase Console
 Access your Firebase project at: https://console.firebase.google.com/project/thoughtfulmoment-73ec0/overview
