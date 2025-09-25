@@ -1,5 +1,7 @@
 @workspace Je bent een expert AI-ontwikkelaar. Ik ga je het verhaal vertellen van een project dat ik wil bouwen. Op basis van dit verhaal genereer je alle benodigde code, bestandsstructuren en commando's in een helder, georganiseerd formaat.
 
+**VERBODEN OM ZONDER SPECIFIEKE TOESTEMMING BEPAALDE FUNCTIES UIT HET PROJECT TE VERWIJDEREN**
+
 Hier is het verhaal:
 
 Ik heb een idee voor een diep persoonlijk en creatief project: een "AI-gestuurd visueel dagboek". Het concept is eenvoudig maar krachtig. Elke dag genereert een AI automatisch een uniek kunstwerk op basis van een reeks thema's en tags die ik definieer. Deze afbeelding wordt vervolgens weergegeven op een strakke, minimalistische website die ik elke ochtend kan bezoeken. Het is als een visueel dagboek, gecreëerd door een AI, dat mijn gekozen stemming of stijl voor die dag weerspiegelt.
