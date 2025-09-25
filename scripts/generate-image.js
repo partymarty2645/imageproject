@@ -1,5 +1,4 @@
 import { Octokit } from '@octokit/rest';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -50,15 +49,7 @@ async function generateDailyInspirationalImage() {
   const randomTerm = inspirationalTerms[Math.floor(Math.random() * inspirationalTerms.length)];
 
   try {
-    // Try Gemini first (if available - requires API key)
-    console.log('🔍 Trying Gemini API...');
-    const geminiImage = await generateGeminiImage(randomTerm);
-    if (geminiImage) {
-      console.log('✅ Generated Gemini image');
-      return geminiImage;
-    }
-
-    // Try Pixabay as second option
+    // Try Pixabay first (better results for fantasy themes)
     console.log('🔍 Trying Pixabay API...');
     const pixabayImages = await searchPixabayImages(randomTerm);
 
@@ -70,7 +61,7 @@ async function generateDailyInspirationalImage() {
       return await downloadAndCompressImage(imageUrl);
     }
 
-    // Try Pexels as final fallback
+    // Try Pexels as fallback
     console.log('🔍 Trying Pexels API...');
     const pexelsImages = await searchPexelsImages(randomTerm);
 
@@ -98,7 +89,6 @@ async function generateDailyInspirationalImage() {
 // Pexels API functions (adapted for Node.js)
 const PEXELS_API_KEY = process.env.PEXELS_API_KEY || '';
 const PIXABAY_API_KEY = process.env.PIXABAY_API_KEY || '';
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 
 async function searchPexelsImages(query) {
   if (!PEXELS_API_KEY) {
@@ -145,43 +135,6 @@ async function searchPixabayImages(query) {
   } catch (error) {
     console.error('Error searching Pixabay:', error);
     return [];
-  }
-}
-
-async function generateGeminiImage(prompt) {
-  if (!GEMINI_API_KEY) {
-    console.log('⚠️ No Gemini API key, skipping Gemini generation');
-    return null;
-  }
-
-  try {
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        responseMimeType: 'image/png',
-      }
-    });
-
-    const imagePrompt = `Generate an image: Create a beautiful, serene fantasy artwork: ${prompt}. Make it magical and peaceful, suitable for couples journaling. High quality, detailed, artistic style.`;
-
-    const result = await model.generateContent(imagePrompt);
-    const response = await result.response;
-
-    // Check if we got image data
-    const parts = response.candidates[0]?.content?.parts;
-    if (parts && parts.length > 0 && parts[0].inlineData) {
-      const imageData = parts[0].inlineData.data;
-      console.log('✅ Generated Gemini image successfully');
-      return Buffer.from(imageData, 'base64');
-    }
-
-    console.log('⚠️ No image data in Gemini response, got text instead');
-    return null;
-
-  } catch (error) {
-    console.error('Error with Gemini API:', error.message);
-    return null;
   }
 }
 
