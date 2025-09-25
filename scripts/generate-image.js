@@ -74,7 +74,7 @@ async function generateDailyInspirationalImage() {
     }
 
     // Use curated collection as final fallback
-    console.log('� Using curated inspirational collection...');
+    console.log('🔍 Using curated inspirational collection...');
     const curatedUrl = await getCuratedInspirationalImage();
     console.log('✅ Using curated image');
     return await downloadAndCompressImage(curatedUrl);
