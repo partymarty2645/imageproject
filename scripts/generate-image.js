@@ -34,7 +34,7 @@ Avoid any dark, scary, or negative imagery. Focus on beauty and tranquility.
 async function generateImage() {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ 
-    model: 'imagen-4',
+    model: 'gemini-1.5-pro-latest',
     generationConfig: {
       responseModalities: ['Text', 'Image']
     }
