@@ -49,19 +49,7 @@ async function generateDailyInspirationalImage() {
   const randomTerm = inspirationalTerms[Math.floor(Math.random() * inspirationalTerms.length)];
 
   try {
-    // Try Pexels first (higher quality)
-    console.log('🔍 Trying Pexels API...');
-    const pexelsImages = await searchPexelsImages(randomTerm);
-
-    if (pexelsImages.length > 0) {
-      const randomImage = pexelsImages[Math.floor(Math.random() * pexelsImages.length)];
-      const imageUrl = randomImage.src.large;
-
-      console.log('✅ Found Pexels image:', randomImage.photographer);
-      return await downloadAndCompressImage(imageUrl);
-    }
-
-    // Try Pixabay as fallback
+    // Try Pixabay first (better results for fantasy themes)
     console.log('🔍 Trying Pixabay API...');
     const pixabayImages = await searchPixabayImages(randomTerm);
 
@@ -70,6 +58,18 @@ async function generateDailyInspirationalImage() {
       const imageUrl = randomImage.largeImageURL;
 
       console.log('✅ Found Pixabay image:', randomImage.user);
+      return await downloadAndCompressImage(imageUrl);
+    }
+
+    // Try Pexels as fallback
+    console.log('🔍 Trying Pexels API...');
+    const pexelsImages = await searchPexelsImages(randomTerm);
+
+    if (pexelsImages.length > 0) {
+      const randomImage = pexelsImages[Math.floor(Math.random() * pexelsImages.length)];
+      const imageUrl = randomImage.src.large;
+
+      console.log('✅ Found Pexels image:', randomImage.photographer);
       return await downloadAndCompressImage(imageUrl);
     }
 
