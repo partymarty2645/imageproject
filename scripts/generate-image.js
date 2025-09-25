@@ -10,38 +10,85 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || 'partymarty2645/image
 const OWNER = GITHUB_REPOSITORY.split('/')[0];
 const REPO = GITHUB_REPOSITORY.split('/')[1];
 
-// Predefined tags for prompts
+// Predefined tags for prompts - expanded for more variety
 const tags = [
-  'surreal landscape',
-  'dreamy forest',
-  'ethereal mountains',
-  'mystical ocean',
-  'fantasy castle',
-  'peaceful meadow',
-  'abstract emotions',
-  'cosmic wonder'
+  // Nature themes
+  'serene mountain lake at dawn',
+  'mystical forest with glowing mushrooms',
+  'peaceful ocean waves at sunset',
+  'ethereal desert oasis',
+  'tranquil bamboo grove',
+  'majestic waterfall in autumn',
+  'gentle river through wildflowers',
+  'snow-capped peaks under northern lights',
+  
+  // Fantasy elements
+  'floating crystal palace',
+  'enchanted garden with fairies',
+  'magical library with floating books',
+  'celestial observatory',
+  'ancient stone circle at midnight',
+  'floating islands in the clouds',
+  'underground crystal cavern',
+  'mythical creature in peaceful repose',
+  
+  // Abstract and emotional
+  'flowing colors of serenity',
+  'geometric patterns of harmony',
+  'swirling energies of calm',
+  'intertwined vines of connection',
+  'dancing light particles',
+  'ripples of tranquility',
+  'woven threads of fate',
+  'breathing patterns of nature',
+  
+  // Seasonal and time-based
+  'spring blossoms awakening',
+  'summer meadow in full bloom',
+  'autumn leaves gently falling',
+  'winter snowflakes dancing',
+  'morning dew on petals',
+  'golden hour light through trees',
+  'starry night sky over hills',
+  'moonlit path through woods'
 ];
 
 const IMAGE_GENERATION_PROMPT = `
-A breathtakingly beautiful and serene fantasy digital painting.
-The style must be ethereal and magical, deeply inspired by the intricate detail and saturated colors of Josephine Wall, the classic fairy-tale linework of Arthur Rackham, and the romanticism of the Pre-Raphaelite movement.
-Incorporate the flowing, organic forms of Art Nouveau in the composition.
-The mood should be one of wonder, peace, and enchantment.
-The scene should be filled with soft light, mystical elements, and a sense of calm.
-Avoid any dark, scary, or negative imagery. Focus on beauty and tranquility.
+Create a breathtakingly beautiful and serene digital artwork that evokes peace, wonder, and tranquility.
+The style should be ethereal and magical, with intricate details and harmonious composition.
+
+Artistic influences to draw from (choose or blend as appropriate):
+- The saturated colors and mystical elements of Josephine Wall
+- The delicate linework and fairy-tale atmosphere of Arthur Rackham
+- The romantic beauty and natural forms of the Pre-Raphaelite movement
+- The flowing, organic curves of Art Nouveau design
+- The luminous quality of Impressionist landscape painting
+- The symbolic depth of Symbolist art
+- The harmonious balance of Classical composition
+- The dreamlike quality of Surrealist imagination
+
+Key requirements:
+- Focus on beauty, peace, and positive emotions
+- Use soft, harmonious lighting and color palettes
+- Incorporate natural or mystical elements that feel calming
+- Avoid any dark, scary, or negative imagery
+- Create a sense of wonder and gentle magic
+- Ensure the composition feels balanced and serene
+
+The artwork should inspire contemplation and bring a sense of calm to the viewer.
 `;
 
 async function generateImage() {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-pro-latest',
+    model: 'gemini-1.5-pro',
     generationConfig: {
       responseModalities: ['Text', 'Image']
     }
   });
 
   const randomTag = tags[Math.floor(Math.random() * tags.length)];
-  const fullPrompt = `${IMAGE_GENERATION_PROMPT}\n\nCreate a beautiful fantasy image with the theme: ${randomTag}. Make it calming and inspirational.`;
+  const fullPrompt = `${IMAGE_GENERATION_PROMPT}\n\nCreate a unique and beautiful artwork featuring: ${randomTag}. Let your creativity flow while maintaining the serene and inspirational quality. Feel free to interpret this theme in your own artistic way.`;
 
   try {
     console.log('🔮 Generating image with Gemini API...');
