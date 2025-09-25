@@ -155,22 +155,43 @@ async function generateGeminiImage(prompt) {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    // Use the Imagen API for actual image generation
+    const imagenUrl = 'https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict';
+    const requestBody = {
+      prompt: {
+        text: `Create a beautiful, serene fantasy artwork: ${prompt}. Make it magical and peaceful, suitable for couples journaling. High quality, detailed, artistic style.`
+      },
+      generationConfig: {
+        numberOfImages: 1,
+        aspectRatio: "1:1",
+        personGeneration: "allow_adult"
+      }
+    };
 
-    const imagePrompt = `Create a beautiful, serene fantasy artwork: ${prompt}. Make it magical and peaceful, suitable for couples journaling. High quality, detailed, artistic style.`;
+    const response = await fetch(`${imagenUrl}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
 
-    const result = await model.generateContent(imagePrompt);
-    const response = await result.response;
-    const text = response.text();
+    if (!response.ok) {
+      throw new Error(`Imagen API error: ${response.status}`);
+    }
 
-    // Note: Gemini text models don't generate images directly
-    // This would need Imagen model, but that's not available in the free tier
-    console.log('⚠️ Gemini text response (Imagen model needed for actual image generation):', text.substring(0, 100) + '...');
-    return null; // Return null to fall back to other APIs
+    const data = await response.json();
+
+    if (data.predictions && data.predictions.length > 0) {
+      const imageData = data.predictions[0].bytesBase64Encoded;
+      console.log('✅ Generated Gemini Imagen successfully');
+      return Buffer.from(imageData, 'base64');
+    }
+
+    return null;
 
   } catch (error) {
-    console.error('Error with Gemini API:', error);
+    console.error('Error with Gemini Imagen API:', error.message);
     return null;
   }
 }
